@@ -1,71 +1,54 @@
+// server.js — CommonJS version (chạy ổn định Render + Node 22)
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const OpenAI = require("openai");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post("/generate", async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    console.log("Prompt nhận:", prompt);
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import OpenAI from "openai";
-
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
-
+// 🔸 Cấu hình OpenAI key (Render → Environment → Add "OPENAI_API_KEY")
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // thêm key của bạn trong Render Environment
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
+// ✅ Route test đơn giản
+app.get("/", (req, res) => {
+  res.send("✅ Server AI Image Generator đang hoạt động!");
+});
+
+// ✅ Route tạo ảnh từ văn bản
 app.post("/generate", async (req, res) => {
   try {
     const { prompt } = req.body;
-    console.log("Prompt nhận:", prompt);
+    console.log("📩 Prompt nhận:", prompt);
 
+    // Nếu không có prompt thì báo lỗi
+    if (!prompt) {
+      return res.status(400).json({ error: "Thiếu prompt!" });
+    }
+
+    // 🔹 Gọi OpenAI tạo ảnh (4 ảnh chất lượng cao)
     const result = await client.images.generate({
       model: "gpt-image-1",
-      prompt,
-      size: "1024x1024", // có thể đổi thành 1792x1024, 4K...
+      prompt: prompt,
+      n: 4,
+      size: "1024x1024"
     });
 
-    res.json({ url: result.data[0].url });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Lỗi khi tạo ảnh" });
+    // 🔹 Trả danh sách link ảnh
+    const imageUrls = result.data.map((img) => img.url);
+    res.json({ images: imageUrls });
+  } catch (error) {
+    console.error("❌ Lỗi /generate:", error);
+    res.status(500).json({ error: "Không thể tạo ảnh!" });
   }
 });
 
-app.get("/", (req, res) => res.send("✅ Image API đang hoạt động!"));
+// ✅ Khởi động server
 const PORT = process.env.PORT || 10002;
-app.listen(PORT, () => console.log(`🚀 Server chạy tại cổng ${PORT}`));
-
-   
-    res.json({ url: fakeImage });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Lỗi khi tạo ảnh" });
-  }
-});
-
-app.get("/", (req, res) => {
-  res.send("✅ Image API đang hoạt động!");
-});
-
-// --- Chỉ giữ 1 đoạn listen duy nhất ---
-const PORT = process.env.PORT || 10002;
-
 app.listen(PORT, () => {
   console.log(`🚀 Server đang chạy tại cổng ${PORT}`);
-}).on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`❌ Cổng ${PORT} đã được sử dụng. Thử cổng khác...`);
-  } else {
-    console.error(err);
-  }
 });
