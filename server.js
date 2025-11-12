@@ -24,7 +24,7 @@ app.post("/generate", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("✅ Image API đang hoạt động!");
 });
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 10001;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy tại cổng ${PORT}`));
 
 const port = process.env.PORT || 10000;
