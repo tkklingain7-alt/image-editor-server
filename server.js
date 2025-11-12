@@ -1,30 +1,29 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import fetch from "node-fetch";
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: "20mb" }));
+app.use(bodyParser.json());
 
-// API test
-app.get("/", (req, res) => {
-  res.send("🚀 Image Editor Server is running!");
-});
-
-// API xử lý ảnh mẫu
-app.post("/enhance", async (req, res) => {
+app.post("/generate", async (req, res) => {
   try {
-    const { image } = req.body;
-    if (!image) return res.status(400).json({ error: "No image provided" });
+    const { prompt } = req.body;
+    console.log("Prompt nhận:", prompt);
 
-    // Giả lập xử lý ảnh (sẽ thêm AI sau)
-    res.json({ success: true, url: image });
+    // Dòng dưới chỉ là giả lập kết quả demo — bạn có thể thay bằng API AI thực
+    const fakeImage = `https://placehold.co/600x400?text=${encodeURIComponent(prompt)}`;
+
+    res.json({ url: fakeImage });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error enhancing image" });
+    res.status(500).json({ error: "Lỗi khi tạo ảnh" });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.get("/", (req, res) => {
+  res.send("✅ Image API đang hoạt động!");
+});
+
+const port = process.env.PORT || 10000;
+app.listen(port, () => console.log(`✅ Server running on port ${port}`));
