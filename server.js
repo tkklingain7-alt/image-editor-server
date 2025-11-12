@@ -10,10 +10,42 @@ app.post("/generate", async (req, res) => {
   try {
     const { prompt } = req.body;
     console.log("Prompt nhận:", prompt);
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import OpenAI from "openai";
 
-    // Dòng dưới chỉ là giả lập kết quả demo — bạn có thể thay bằng API AI thực
-    const fakeImage = `https://placehold.co/600x400?text=${encodeURIComponent(prompt)}`;
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // thêm key của bạn trong Render Environment
+});
+
+app.post("/generate", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    console.log("Prompt nhận:", prompt);
+
+    const result = await client.images.generate({
+      model: "gpt-image-1",
+      prompt,
+      size: "1024x1024", // có thể đổi thành 1792x1024, 4K...
+    });
+
+    res.json({ url: result.data[0].url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Lỗi khi tạo ảnh" });
+  }
+});
+
+app.get("/", (req, res) => res.send("✅ Image API đang hoạt động!"));
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`🚀 Server chạy tại cổng ${PORT}`));
+
+   
     res.json({ url: fakeImage });
   } catch (err) {
     console.error(err);
