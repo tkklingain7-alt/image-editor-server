@@ -24,8 +24,18 @@ app.post("/generate", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("✅ Image API đang hoạt động!");
 });
-const PORT = process.env.PORT || 10001;
+const PORT = process.env.PORT || 10002;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy tại cổng ${PORT}`));
 
-const port = process.env.PORT || 10001;
+const port = process.env.PORT || 10002;
 app.listen(port, () => console.log(`✅ Server running on port ${port}`));
+const PORT = process.env.PORT || 10002;
+app.listen(PORT, () => {
+  console.log(`🚀 Server đang chạy tại cổng ${PORT}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Cổng ${PORT} đã được sử dụng. Thử cổng khác...`);
+  } else {
+    console.error(err);
+  }
+});
