@@ -27,5 +27,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 10001;
 app.listen(PORT, () => console.log(`🚀 Server đang chạy tại cổng ${PORT}`));
 
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 10001;
 app.listen(port, () => console.log(`✅ Server running on port ${port}`));
